@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<link rel="manifest" href="manifest.json">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="apple-mobile-web-app-title" content="Temporizador 25+5">
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temporizador 25+5</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f3f4f6;
+        }
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        #timer {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .btn {
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .btn:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+        .message {
+            font-size: 18px;
+            font-weight: normal;
+            color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="timer">25:00</div>
+        <button id="startButton" class="btn">Iniciar</button>
+        <button id="pauseButton" class="btn" disabled>Pausar</button>
+        <button id="resetButton" class="btn">Reiniciar</button>
+        <div id="message" class="message"></div>
+    </div>
+
+    <script>
+
+	if ("serviceWorker" in navigator) {
+   	navigator.serviceWorker.register("service-worker.js")
+        .then(() => console.log("Service Worker registrado"))
+        .catch(error => console.log("Error al registrar el Service Worker:", error));
+	}
+
+	
+        let countdown;
+        let isPaused = false;
+        let isOnBreak = false;
+        let timeLeft = 25 * 60;  // 25 minutos en segundos
+        let breakTime = 5 * 60;  // 5 minutos en segundos
+
+        const timerDisplay = document.getElementById('timer');
+        const startButton = document.getElementById('startButton');
+        const pauseButton = document.getElementById('pauseButton');
+        const resetButton = document.getElementById('resetButton');
+        const message = document.getElementById('message');
+
+        // Función para iniciar el temporizador
+        function startTimer() {
+            countdown = setInterval(function() {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(countdown);
+                    if (!isOnBreak) {
+                        message.textContent = "¡Tiempo terminado! Descanso de 5 minutos.";
+                        isOnBreak = true;
+                        timeLeft = breakTime;
+                        startTimer();
+                    } else {
+                        message.textContent = "¡Descanso terminado! Volver a trabajar.";
+                        isOnBreak = false;
+                        timeLeft = 25 * 60;
+                        startTimer();
+                    }
+                }
+            }, 1000);
+        }
+
+        // Función para actualizar el contador en pantalla
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+
+        // Función para pausar el temporizador
+        function pauseTimer() {
+            clearInterval(countdown);
+            isPaused = true;
+            startButton.disabled = false;
+            pauseButton.disabled = true;
+        }
+
+        // Función para reiniciar el temporizador
+        function resetTimer() {
+            clearInterval(countdown);
+            timeLeft = isOnBreak ? breakTime : 25 * 60;
+            isPaused = false;
+            isOnBreak = false;
+            message.textContent = "";
+            updateTimerDisplay();
+            startButton.disabled = false;
+            pauseButton.disabled = true;
+        }
+
+        // Manejo de los botones
+        startButton.addEventListener('click', () => {
+            if (isPaused) {
+                startTimer();
+                startButton.disabled = true;
+                pauseButton.disabled = false;
+            } else {
+                startTimer();
+                startButton.disabled = true;
+                pauseButton.disabled = false;
+            }
+        });
+
+        pauseButton.addEventListener('click', pauseTimer);
+        resetButton.addEventListener('click', resetTimer);
+    </script>
+</body>
+</html>
