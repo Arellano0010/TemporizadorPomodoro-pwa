@@ -4,22 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Temporizador Pomodoro</title>
-    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" href="icon-192x192.png" type="image/png">
-    <meta name="theme-color" content="#4CAF50">
-</head>
-<body>
-    <div class="container">
-        <h1>Temporizador Pomodoro</h1>
-        <div id="timer">25:00</div>
-        <button id="startButton" class="btn">Iniciar</button>
-        <button id="pauseButton" class="btn" disabled>Pausar</button>
-        <button id="resetButton" class="btn">Reiniciar</button>
-        <div id="message" class="message"></div>
-    </div>
-
-    <script src="script.js"></script>
+    <link rel="manifest" href="manifest.json">
+    <script defer src="script.js"></script>
     <script>
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker
@@ -28,5 +15,31 @@
                 .catch(error => console.log("Error al registrar el Service Worker", error));
         }
     </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Temporizador Pomodoro</h1>
+        <h2 id="mode">Enfoque</h2>
+        <div id="timer">25:00</div>
+        <div class="buttons">
+            <button id="start">Iniciar</button>
+            <button id="reset">Reiniciar</button>
+            <button id="adjust">Ajustar</button>
+        </div>
+    </div>
+
+    <div id="settings" class="modal">
+        <div class="modal-content">
+            <h2>Ajustar Tiempos</h2>
+            <label>Tiempo de Enfoque (min): 
+                <input type="number" id="focusTime" min="1" value="25">
+            </label>
+            <label>Tiempo de Descanso (min): 
+                <input type="number" id="breakTime" min="1" value="5">
+            </label>
+            <button id="saveSettings">Guardar</button>
+            <button id="closeSettings">Cerrar</button>
+        </div>
+    </div>
 </body>
 </html>
